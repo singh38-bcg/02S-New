@@ -4201,119 +4201,107 @@ function renderCtBudget(){
   var mount=document.getElementById('ct-budget'); if(!mount)return;
   var h='';
 
-  /* ─ Header ─────────────────────────────────────────────────── */
-  h+='<div style="margin-bottom:22px">';
-  h+='<h1 style="font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.1;color:var(--g900);margin:0 0 10px">Financial overview</h1>';
-  h+='<div style="display:flex;gap:7px;flex-wrap:wrap">';
-  h+='<span class="chip">02S field operations &middot; all active projects</span>';
-  h+='<span class="chip ver">V1 &mdash; standard</span>';
-  h+='</div></div>';
+  /* ── Header — matches all other CT screens ── */
+  h+='<div class="phead"><div><h1>Financial overview</h1>';
+  h+='<div class="meta"><span class="chip">02S field operations &middot; all active projects</span>';
+  h+='<span class="chip ver">V1 &mdash; standard</span></div></div></div>';
 
-  /* ─ Lineage strip — uses .vital class for MC-consistent styling ─ */
-  var STAGES=[
-    {k:'Opportunities',v:'$42M+',sub:'pipeline &middot; 2 active',tone:'ok',click:"ctNav('ct-opp-list')"},
-    {k:'Demand plans',  v:'$26.4M',sub:'planned &middot; 3 projects',tone:'',click:''},
-    {k:'In-flight',    v:'$16.2M',sub:'committed &middot; 94 units on-rent',tone:'',click:''},
-    {k:'Tracking',     v:'$929K/mo',sub:'equip burn &middot; 3 at-risk',tone:'bad',click:''}
-  ];
-  h+='<div style="display:flex;align-items:stretch;gap:8px;margin-bottom:28px">';
-  STAGES.forEach(function(s,i){
-    h+='<div class="vital'+( s.tone?' '+s.tone:'')+(s.click?' ct-stage-link':'')+'" style="flex:1'+(s.click?';cursor:pointer':'')+'"'+(s.click?' onclick="'+s.click+'"':'')+' >';
-    h+='<div class="vk">'+s.k+'</div>';
-    h+='<div class="vv">'+s.v+'</div>';
-    h+='<div class="vsub">'+s.sub+'</div>';
-    h+='</div>';
-    if(i<STAGES.length-1) h+='<div style="display:flex;align-items:center;color:var(--g300);flex-shrink:0;font-size:16px;padding:0 2px">&rarr;</div>';
-  });
+  /* ── Pipeline strip: one connected bar, 4 stages ── */
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--g200);border-radius:var(--radius);overflow:hidden;margin-bottom:26px">';
+  h+='<div style="padding:14px 16px;background:#f0fdf4;border-right:1px solid var(--g200);border-top:3px solid var(--success);cursor:pointer" onclick="ctNav(\'ct-opp-list\')">';
+  h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--success);margin-bottom:8px">Opportunities</div>';
+  h+='<div style="font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--charcoal)">$42M+</div>';
+  h+='<div style="font-size:12px;color:var(--g500);margin-top:5px">pipeline &middot; 2 active</div></div>';
+  h+='<div style="padding:14px 16px;background:#eff6ff;border-right:1px solid var(--g200);border-top:3px solid var(--info)">';
+  h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--info);margin-bottom:8px">Demand plans</div>';
+  h+='<div style="font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--charcoal)">$26.4M</div>';
+  h+='<div style="font-size:12px;color:var(--g500);margin-top:5px">planned &middot; 3 projects</div></div>';
+  h+='<div style="padding:14px 16px;background:var(--g50);border-right:1px solid var(--g200);border-top:3px solid var(--charcoal)">';
+  h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--charcoal);margin-bottom:8px">In-flight</div>';
+  h+='<div style="font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--charcoal)">$16.2M</div>';
+  h+='<div style="font-size:12px;color:var(--g500);margin-top:5px">committed &middot; 94 units on-rent</div></div>';
+  h+='<div style="padding:14px 16px;background:var(--warning-tint);border-top:3px solid var(--warning)">';
+  h+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--warning);margin-bottom:8px">Tracking</div>';
+  h+='<div style="font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--charcoal)">$929K/mo</div>';
+  h+='<div style="font-size:12px;color:var(--g500);margin-top:5px">equip burn &middot; 3 at-risk</div></div>';
   h+='</div>';
 
-  /* ─ Opportunity → demand plan handshake ─────────────────────── */
+  /* ── Opportunity → demand plan linkage ── */
   h+='<div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--g500);margin-bottom:6px">Opportunity &rarr; demand plan linkage</div>';
   var LINK=[
-    {proj:'Hercules Solar + BESS',oppVal:'$22.6M project',oppStage:'Active',oppTone:'ok',
-     dpPillars:'5 pillars',dpBudget:'$22.6M',committed:'$14.6M',pct:'65%',dpTone:'bad',dpLbl:'1 at-risk'},
-    {proj:'1GPA JOC &ndash; 2026 Q1',oppVal:'$1.8M',oppStage:'Won',oppTone:'ok',
-     dpPillars:'3 pillars',dpBudget:'$1.2M',committed:'$1.1M',pct:'92%',dpTone:'ok',dpLbl:'On track'},
-    {proj:'Eastside Stormwater',oppVal:'&mdash;',oppStage:'Mobilizing',oppTone:'neu',
-     dpPillars:'2 pillars',dpBudget:'$2.6M',committed:'$0.5M',pct:'19%',dpTone:'warn',dpLbl:'2 pending'}
+    {proj:'Hercules Solar + BESS',ov:'$22.6M',os:'Active',ot:'ok',dp:'5 pillars',db:'$22.6M',cm:'$14.6M',pct:'65%',dt:'bad',dl:'1 at-risk'},
+    {proj:'1GPA JOC &ndash; 2026 Q1',ov:'$1.8M',os:'Won',ot:'ok',dp:'3 pillars',db:'$1.2M',cm:'$1.1M',pct:'92%',dt:'ok',dl:'On track'},
+    {proj:'Eastside Stormwater',ov:'&mdash;',os:'Mobilizing',ot:'neu',dp:'2 pillars',db:'$2.6M',cm:'$0.5M',pct:'19%',dt:'warn',dl:'2 pending'}
   ];
-  /* Two-section header: OPP side | divider | DP side */
-  var gl='1fr 100px 72px 28px 80px 90px 100px 80px 84px';
+  var gl='1fr 90px 80px 20px 80px 90px 100px 55px 90px';
   h+='<div class="dp-tbl" style="margin-bottom:26px">';
-  h+='<div style="display:grid;grid-template-columns:'+gl+';gap:12px;padding:8px 16px 0;background:var(--g50)">';
-  h+='<div style="font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--info);padding-bottom:5px;border-bottom:2px solid var(--info)">Opportunity</div>';
-  h+='<div style="font-size:9.5px;font-weight:700;color:var(--info);padding-bottom:5px;border-bottom:2px solid var(--info);text-align:right">Value</div>';
-  h+='<div style="font-size:9.5px;font-weight:700;color:var(--info);padding-bottom:5px;border-bottom:2px solid var(--info)">Stage</div>';
-  h+='<div style="padding-bottom:5px;border-bottom:1px solid var(--g200)"></div>';
-  h+='<div style="font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--success);padding-bottom:5px;border-bottom:2px solid var(--success)">Pillars</div>';
-  h+='<div style="font-size:9.5px;font-weight:700;color:var(--success);padding-bottom:5px;border-bottom:2px solid var(--success);text-align:right">DP budget</div>';
-  h+='<div style="font-size:9.5px;font-weight:700;color:var(--success);padding-bottom:5px;border-bottom:2px solid var(--success);text-align:right">Committed</div>';
-  h+='<div style="font-size:9.5px;font-weight:700;color:var(--success);padding-bottom:5px;border-bottom:2px solid var(--success);text-align:right">%</div>';
-  h+='<div style="font-size:9.5px;font-weight:700;color:var(--success);padding-bottom:5px;border-bottom:2px solid var(--success)">Status</div>';
-  h+='</div>';
-  /* column header row */
-  h+='<div class="dp-head" style="grid-template-columns:'+gl+';background:transparent;border-bottom:1px solid var(--g200)">';
-  h+='<span>Project</span><span class="r">Opp value</span><span>Opp stage</span><span></span>';
-  h+='<span>Pillars</span><span class="r">Budget</span><span class="r">Committed</span><span class="r">%</span><span>Status</span>';
-  h+='</div>';
+  h+='<div class="dp-head" style="grid-template-columns:'+gl+'">';
+  h+='<span style="color:var(--info)">Project</span>';
+  h+='<span class="r" style="color:var(--info)">Opp value</span>';
+  h+='<span style="color:var(--info)">Stage</span><span></span>';
+  h+='<span style="color:var(--success)">Pillars</span>';
+  h+='<span class="r" style="color:var(--success)">Budget</span>';
+  h+='<span class="r" style="color:var(--success)">Committed</span>';
+  h+='<span class="r" style="color:var(--success)">%</span>';
+  h+='<span style="color:var(--success)">Status</span></div>';
   LINK.forEach(function(p){
     h+='<div class="dp-row" style="grid-template-columns:'+gl+'">';
     h+='<div>'+p.proj+'</div>';
-    h+='<div class="r" style="color:var(--g600);font-weight:400">'+p.oppVal+'</div>';
-    h+='<div><span class="tag '+p.oppTone+'">'+p.oppStage+'</span></div>';
+    h+='<div class="r" style="color:var(--g600);font-weight:400">'+p.ov+'</div>';
+    h+='<div><span class="tag '+p.ot+'">'+p.os+'</span></div>';
     h+='<div style="text-align:center;color:var(--g300);font-size:14px">&rarr;</div>';
-    h+='<div class="sub">'+p.dpPillars+'</div>';
-    h+='<div class="r">'+p.dpBudget+'</div>';
-    h+='<div class="r">'+p.committed+'</div>';
+    h+='<div class="sub">'+p.dp+'</div>';
+    h+='<div class="r">'+p.db+'</div>';
+    h+='<div class="r">'+p.cm+'</div>';
     h+='<div class="r" style="color:var(--g500);font-weight:400">'+p.pct+'</div>';
-    h+='<div><span class="tag '+p.dpTone+'">'+p.dpLbl+'</span></div>';
+    h+='<div><span class="tag '+p.dt+'">'+p.dl+'</span></div>';
     h+='</div>';
   });
   h+='</div>';
 
-  /* ─ In-flight by pillar ──────────────────────────────────────── */
+  /* ── In-flight by pillar ── */
   h+='<div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--g500);margin-bottom:6px">In-flight &middot; active now</div>';
   var IF=[
-    {p:'Equipment',      active:'94 units on-rent',rate:'$929K/mo',stat:'7 lines &middot; Aug 2026',tone:'ok'},
-    {p:'Prof. services', active:'14 FTE active',   rate:'$62K/mo', stat:'6 firms &middot; Apr&ndash;Oct',tone:'ok'},
-    {p:'Prefab',         active:'$234K in fab',     rate:'&mdash;', stat:'2 awaiting 02S quote',tone:'warn'},
-    {p:'Procurement',    active:'$55K committed',   rate:'&mdash;', stat:'1 item at-risk',tone:'bad'},
-    {p:'Logistics',      active:'Active contracts', rate:'6 moves/wk',stat:'3 oversize in permits',tone:'ok'}
+    {p:'Equipment',a:'94 units on-rent',r:'$929K/mo',s:'7 lines &middot; Aug 2026',t:'ok'},
+    {p:'Prof. services',a:'14 FTE active',r:'$62K/mo',s:'6 firms &middot; Apr&ndash;Oct',t:'ok'},
+    {p:'Prefab',a:'$234K in fab',r:'&mdash;',s:'2 awaiting 02S quote',t:'warn'},
+    {p:'Procurement',a:'$55K committed',r:'&mdash;',s:'1 item at-risk',t:'bad'},
+    {p:'Logistics',a:'Active contracts',r:'6 moves/wk',s:'3 oversize in permits',t:'ok'}
   ];
   var gi='130px 1fr 90px 1fr 80px';
   h+='<div class="dp-tbl" style="margin-bottom:26px">';
-  h+='<div class="dp-head" style="grid-template-columns:'+gi+'"><span>Pillar</span><span>What\'s active</span><span class="r">Rate</span><span>Key stat</span><span>Status</span></div>';
+  h+='<div class="dp-head" style="grid-template-columns:'+gi+'"><span>Pillar</span><span>Active</span><span class="r">Rate</span><span>Key stat</span><span>Status</span></div>';
   IF.forEach(function(p){
     h+='<div class="dp-row" style="grid-template-columns:'+gi+'">';
     h+='<div>'+p.p+'</div>';
-    h+='<div style="color:var(--g700)">'+p.active+'</div>';
-    h+='<div class="r">'+p.rate+'</div>';
-    h+='<div class="sub">'+p.stat+'</div>';
-    h+='<div><span class="tag '+p.tone+'">'+{ok:'Active',warn:'Pending',bad:'At-risk'}[p.tone]+'</span></div>';
+    h+='<div style="color:var(--g700)">'+p.a+'</div>';
+    h+='<div class="r">'+p.r+'</div>';
+    h+='<div class="sub">'+p.s+'</div>';
+    h+='<div><span class="tag '+p.t+'">'+{ok:'Active',warn:'Pending',bad:'At-risk'}[p.t]+'</span></div>';
     h+='</div>';
   });
   h+='</div>';
 
-  /* ─ Attention items ──────────────────────────────────────────── */
+  /* ── Items needing attention ── */
   h+='<div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--g500);margin-bottom:8px">Items needing attention</div>';
   var EX=[
-    {tone:'bad', title:'Tone shear wrenches',proj:'Procurement &middot; Hercules Solar',
-     msg:'At-risk &middot; order-by Jul 18 passed &middot; needed for structural bolt tensioning Aug 15'},
-    {tone:'warn',title:'VDC / BIM coordination',proj:'Professional services &middot; Hercules Solar',
-     msg:'Pending pricing &middot; role needed Apr&ndash;Oct &middot; firm not in rate card'},
-    {tone:'warn',title:'BESS e-houses + cable tray runs',proj:'Prefab &middot; Hercules Solar',
-     msg:'2 assemblies awaiting 02S quote &middot; e-house submittal still in review'}
+    {t:'bad',ti:'Tone shear wrenches',pr:'Procurement &middot; Hercules Solar',
+     ms:'At-risk &middot; order-by Jul 18 passed &middot; needed for structural bolt tensioning Aug 15'},
+    {t:'warn',ti:'VDC / BIM coordination',pr:'Professional services &middot; Hercules Solar',
+     ms:'Pending pricing &middot; role needed Apr&ndash;Oct &middot; firm not in rate card'},
+    {t:'warn',ti:'BESS e-houses + cable tray runs',pr:'Prefab &middot; Hercules Solar',
+     ms:'2 assemblies awaiting 02S quote &middot; e-house submittal still in review'}
   ];
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
   EX.forEach(function(e){
-    var bg=e.tone==='bad'?'var(--red-tint)':'var(--warning-tint)';
-    var bd=e.tone==='bad'?'rgba(220,29,52,.25)':'rgba(138,109,31,.25)';
+    var bg=e.t==='bad'?'var(--red-tint)':'var(--warning-tint)';
+    var bd=e.t==='bad'?'rgba(220,29,52,.25)':'rgba(138,109,31,.25)';
     h+='<div style="background:'+bg+';border:1px solid '+bd+';border-radius:var(--radius);padding:11px 14px">';
     h+='<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:3px">';
-    h+='<span style="font-size:12.5px;font-weight:600;color:var(--g900)">'+e.title+'</span>';
-    h+='<span style="font-size:11px;color:var(--g500)">'+e.proj+'</span>';
+    h+='<span style="font-size:12.5px;font-weight:600;color:var(--g900)">'+e.ti+'</span>';
+    h+='<span style="font-size:11px;color:var(--g500)">'+e.pr+'</span>';
     h+='</div>';
-    h+='<div style="font-size:12px;color:var(--g700)">'+e.msg+'</div>';
+    h+='<div style="font-size:12px;color:var(--g700)">'+e.ms+'</div>';
     h+='</div>';
   });
   h+='</div>';
